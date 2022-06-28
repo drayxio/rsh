@@ -19,7 +19,7 @@ def sinput(string):
 
 def choice_input(string, answers=["y", "n"]):
     answer = sinput(f"{string} ({'/'.join(answers)}) > ").lower()
-    while answer not in [ans.lower() for ans in answers]: answer = input(f"{string} ({'/'.join(answers)}) > ").lower()
+    while answer not in [ans.lower() for ans in answers]: answer = sinput(f"{string} ({'/'.join(answers)}) > ").lower()
     if answers == ["y", "n"]: answer = {"y": True, "n": False}[answer]
     return answer
 
