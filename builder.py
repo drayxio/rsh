@@ -143,7 +143,7 @@ def main():
     if is_hosted:
 
         global service
-        service = choice_input("Which service do you want to use", ["Discord Webhook","Anonfiles"])
+        service = choice_input("Which services do you want to use", ["Discord Webhook","Anonfiles"])
 
         if service == "discord webhook":
             global webhook_url
