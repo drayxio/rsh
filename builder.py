@@ -143,7 +143,7 @@ def main():
     if is_hosted:
 
         global service
-        service = choice_input("What service do you want to use", ["Discord Webhook","Anonfiles"])
+        service = choice_input("Which service do you want to use", ["Discord Webhook","Anonfiles"])
 
         if service == "discord webhook":
             global webhook_url
@@ -161,7 +161,7 @@ def main():
 
         if is_encoded:
             global encoding
-            encoding = choice_input("What encoding do you want to use", ["base64", "hexadecimal"])
+            encoding = choice_input("Which encoding do you want to use", ["base64", "hexadecimal"])
 
     build()
     sinput("done!")
