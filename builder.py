@@ -65,8 +65,6 @@ def build():
 
         file_url = resp.text
 
-        print(file_url)
-
         if is_shorted:
 
             headers = {
